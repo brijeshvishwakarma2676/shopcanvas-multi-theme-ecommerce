@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, ShoppingBag, Menu, X, User } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Header({ cartCount = 0, onSearchOpen }) {
@@ -65,6 +65,9 @@ export default function Header({ cartCount = 0, onSearchOpen }) {
           >
             <Search size={20} />
           </button>
+          <Link to="/login" aria-label="Login">
+            <User size={20} style={{ color: "var(--th-text)" }} />
+          </Link>
           <Link to="/cart" className="relative" aria-label="Cart">
             <ShoppingBag size={20} style={{ color: "var(--th-text)" }} />
             {cartCount > 0 && (

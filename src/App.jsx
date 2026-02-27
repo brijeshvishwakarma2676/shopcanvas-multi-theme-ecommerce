@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
+import Login from "./pages/Login";
 
 function ScrollHandler() {
   const location = useLocation();
@@ -112,6 +113,7 @@ function AppInner() {
               />
             }
           />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </main>
 
