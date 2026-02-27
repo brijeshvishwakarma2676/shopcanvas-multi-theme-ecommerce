@@ -12,10 +12,17 @@ export const THEME_META = {
 };
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState("gallery");
-  const [dark, setDark] = useState(false);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("shopcanvas-theme") || "gallery";
+  });
+  const [dark, setDark] = useState(() => {
+    return localStorage.getItem("shopcanvas-dark") === "true";
+  });
 
   useEffect(() => {
+    localStorage.setItem("shopcanvas-theme", theme);
+    localStorage.setItem("shopcanvas-dark", dark);
+
     const root = document.documentElement;
     // Remove all theme attrs
     root.removeAttribute("data-theme");
