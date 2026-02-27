@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+@theme {
+  /* Font families */
+  --font-display: "Manrope", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "DM Mono", monospace;
+
+  /* === ART GALLERY THEME (default) === */
+  --color-primary: #c8a96f;
+  --color-primary-dark: #b09259;
+  --color-bg-light: #f8f7f6;
+  --color-bg-dark: #1e1a14;
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #2a2620;
+
+  /* Shared tokens */
+  --color-text-primary: #0f0f0f;
+  --color-text-muted: #6b7280;
+
+  /* Border radius (sharp/gallery feel) */
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+}
+
+/* ── Theme CSS Variables (applied on :root) ── */
+:root {
+  --th-primary: #c8a96f;
+  --th-primary-hover: #b09259;
+  --th-bg: #f8f7f6;
+  --th-bg-dark: #1e1a14;
+  --th-surface: #ffffff;
+  --th-surface-dark: #2a2620;
+  --th-text: #1a1814;
+  --th-muted: #6b7280;
+  color-scheme: light;
+}
+
+/* Dark mode */
+:root.dark {
+  --th-bg: #1e1a14;
+  --th-surface: #2a2620;
+  --th-text: #f5f0e8;
+  --th-muted: #9ca3af;
+  color-scheme: dark;
+}
+
+/* ── Theme Overrides ── */
+[data-theme="luxury"] {
+  --th-primary: #9B6BB5;
+  --th-primary-hover: #7a4f9a;
+  --th-bg: #F5F2F7;
+  --th-bg-dark: #1a121e;
+  --th-surface: #faf8fc;
+  --th-surface-dark: #241a2a;
+}
+[data-theme="luxury"].dark {
+  --th-bg: #1a121e;
+  --th-surface: #241a2a;
+}
+
+[data-theme="gourmet"] {
+  --th-primary: #5A8A4A;
+  --th-primary-hover: #3e6133;
+  --th-bg: #F2F7F0;
+  --th-bg-dark: #1a2618;
+  --th-surface: #f8faf6;
+  --th-surface-dark: #1f2e1c;
+}
+[data-theme="gourmet"].dark {
+  --th-bg: #1a2618;
+  --th-surface: #1f2e1c;
+}
+
+[data-theme="street"] {
+  --th-primary: #E8FF00;
+  --th-primary-hover: #c2d600;
+  --th-bg: #0F0F0F;
+  --th-bg-dark: #0F0F0F;
+  --th-surface: #1a1a1a;
+  --th-surface-dark: #222222;
+  --th-text: #f0f0f0;
+  --th-muted: #888888;
+  color-scheme: dark;
+}
+
+/* ── Global Base ── */
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-display);
+    background-color: var(--th-bg);
+    color: var(--th-text);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* ── Utility Classes ── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--th-primary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-DEFAULT);
+}
+.btn-primary:hover {
+  background-color: var(--th-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  color: var(--th-text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  border: 1.5px solid var(--th-primary);
+  cursor: pointer;
+  border-radius: var(--radius-DEFAULT);
+  transition: all 0.2s ease;
+}
+.btn-outline:hover {
+  background-color: var(--th-primary);
+  color: #fff;
+}
+
+.card {
+  background-color: var(--th-surface);
+  border-radius: var(--radius-DEFAULT);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--th-primary);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.surface {
+  background-color: var(--th-surface);
+  color: var(--th-text);
+}
+
+/* Grain texture overlay */
+.bg-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--th-primary); border-radius: 2px; }
+
+/* Page transitions */
+.page-enter { opacity: 0; transform: translateY(8px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.3s ease; }
