@@ -1,100 +1,106 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ShoppingBag, Heart } from "lucide-react";
+import { Plus, Heart } from "lucide-react";
 
 export default function ProductCard({ product, onAddToCart }) {
-  const discounted =
-    product.originalPrice && product.price < product.originalPrice;
+  const [wished, setWished] = useState(false);
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onAddToCart && onAddToCart(product, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1800);
+  };
+
+  const handleWish = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setWished((v) => !v);
+  };
 
   return (
-    <div
-      className="group relative flex flex-col"
-      style={{
-        backgroundColor: "var(--th-surface)",
-        borderRadius: "var(--radius-DEFAULT)",
-      }}
-    >
-      {/* Image */}
-      <Link
-        to={`/product/${product.id}`}
-        className="relative block overflow-hidden aspect-[3/4]"
+    <Link to={`/product/${product.id}`} className="group flex flex-col gap-3">
+      {/* Image container */}
+      <div
+        className="relative w-full aspect-[3/4] overflow-hidden"
+        style={{ backgroundColor: "var(--th-surface)" }}
       >
         <img
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/10" />
 
-        {/* Tag */}
+        {/* Tag badge */}
         {product.tag && (
           <span
-            style={{
-              backgroundColor: "var(--th-primary)",
-              color: product.tag === "Sale" ? "#fff" : "#fff",
-            }}
-            className="absolute left-3 top-3 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+            className="absolute top-3 left-3 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
+            style={{ backgroundColor: "var(--th-primary)", color: "#fff" }}
           >
             {product.tag}
           </span>
         )}
 
-        {/* Wishlist */}
-        <button className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 hover:bg-white">
-          <Heart size={14} className="text-gray-700" />
-        </button>
-
-        {/* Quick add */}
+        {/* Wishlist button */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            onAddToCart && onAddToCart(product);
+          onClick={handleWish}
+          className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+          style={{
+            backgroundColor:
+              "color-mix(in srgb, var(--th-bg) 85%, transparent)",
+            backdropFilter: "blur(4px)",
+            color: wished ? "var(--th-primary)" : "var(--th-muted)",
           }}
-          style={{ backgroundColor: "var(--th-primary)" }}
-          className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-widest text-white opacity-0 transition-all duration-300 group-hover:opacity-100"
+          aria-label="Wishlist"
         >
-          <ShoppingBag size={13} />
-          Quick Add
+          <Heart size={14} fill={wished ? "currentColor" : "none"} />
         </button>
-      </Link>
 
-      {/* Info */}
-      <div className="flex flex-col gap-1 p-3">
+        {/* Quick add button */}
+        <button
+          onClick={handleAdd}
+          className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+          style={{
+            backgroundColor: added
+              ? "var(--th-primary)"
+              : "color-mix(in srgb, var(--th-bg) 90%, transparent)",
+            backdropFilter: "blur(4px)",
+            color: added ? "#fff" : "var(--th-text)",
+            transition: "all 0.2s ease",
+          }}
+          aria-label="Add to cart"
+        >
+          <Plus size={14} strokeWidth={added ? 3 : 2} />
+        </button>
+      </div>
+
+      {/* Product info */}
+      <div className="flex flex-col gap-0.5 px-0.5">
         <p
-          className="text-[10px] font-semibold uppercase tracking-[0.15em]"
-          style={{ color: "var(--th-primary)", fontFamily: "var(--font-mono)" }}
+          className="text-[10px] font-bold uppercase tracking-[0.15em] truncate"
+          style={{ color: "var(--th-muted)", fontFamily: "var(--font-mono)" }}
         >
           {product.artist}
         </p>
-        <Link to={`/product/${product.id}`}>
-          <h3
-            className="text-sm font-semibold leading-tight hover:opacity-70 transition-opacity"
-            style={{ fontFamily: "var(--font-serif)", color: "var(--th-text)" }}
-          >
-            {product.name}
-          </h3>
-        </Link>
-        <div className="flex items-center gap-1 mt-0.5">
-          <Star
-            size={10}
-            fill="currentColor"
-            style={{ color: "var(--th-primary)" }}
-          />
-          <span
-            className="text-[10px] font-mono"
-            style={{ color: "var(--th-muted)" }}
-          >
-            {product.rating} ({product.reviews})
-          </span>
-        </div>
-        <div className="flex items-center gap-2 mt-1">
+        <h3
+          className="text-sm leading-tight font-semibold truncate transition-colors"
+          style={{
+            fontFamily: "var(--font-serif)",
+            color: "var(--th-text)",
+          }}
+        >
+          {product.name}
+        </h3>
+        <div className="flex items-baseline gap-2 mt-1">
           <span
             className="text-sm font-bold"
-            style={{ color: "var(--th-text)" }}
+            style={{ color: "var(--th-primary)" }}
           >
-            ${product.price}
+            ${product.price.toLocaleString()}
           </span>
-          {discounted && (
+          {product.originalPrice && (
             <span
               className="text-xs line-through"
               style={{ color: "var(--th-muted)" }}
@@ -104,6 +110,6 @@ export default function ProductCard({ product, onAddToCart }) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
