@@ -8,6 +8,7 @@ import {
   User,
   Heart,
   ChevronRight,
+  Palette,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -16,13 +17,18 @@ const NAV_LINKS = [
   { to: "/catalog", label: "Shop All" },
 ];
 
-export default function Header({ cartCount = 0, onSearchOpen }) {
+export default function Header({
+  cartCount = 0,
+  onSearchOpen,
+  onCustomizerOpen,
+}) {
   const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef(null);
+  const searchContainerRef = useRef(null);
   const location = useLocation();
 
   const isStreet = theme === "street";
@@ -44,6 +50,22 @@ export default function Header({ cartCount = 0, onSearchOpen }) {
     if (searchOpen && searchRef.current) {
       setTimeout(() => searchRef.current?.focus(), 50);
     }
+  }, [searchOpen]);
+
+  // Click outside to close search
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(e.target)
+      ) {
+        setSearchOpen(false);
+      }
+    };
+    if (searchOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchOpen]);
 
   const logoStyle = {
@@ -122,33 +144,43 @@ export default function Header({ cartCount = 0, onSearchOpen }) {
             {/* ── RIGHT: Desktop search bar + icons ── */}
             <div className="flex items-center gap-2 lg:gap-4">
               {/* Desktop inline search */}
-              <div className="hidden lg:flex items-center gap-2">
+              <div
+                className="hidden lg:flex items-center gap-2"
+                ref={searchContainerRef}
+              >
                 {searchOpen ? (
                   <div
-                    className="flex items-center gap-2 rounded-full px-4 py-1.5 w-56 transition-all duration-200"
+                    onClick={() => searchRef.current?.focus()}
+                    className="flex items-center gap-2 rounded-full px-4 py-1.5 w-64 transition-all duration-300 cursor-text shadow-sm"
                     style={{
                       backgroundColor: "var(--th-surface)",
-                      border:
-                        "1px solid color-mix(in srgb, var(--th-primary) 40%, transparent)",
+                      border: "1px solid var(--th-primary)",
                     }}
                   >
-                    <Search size={14} style={{ color: "var(--th-muted)" }} />
+                    <Search size={14} style={{ color: "var(--th-primary)" }} />
                     <input
                       ref={searchRef}
                       type="text"
                       placeholder="Search products…"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Escape" && setSearchOpen(false)
-                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") setSearchOpen(false);
+                      }}
                       className="flex-1 bg-transparent text-xs outline-none"
                       style={{ color: "var(--th-text)" }}
                     />
                     {searchQuery && (
                       <button
-                        onClick={() => setSearchQuery("")}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSearchQuery("");
+                          searchRef.current?.focus();
+                        }}
                         style={{ color: "var(--th-muted)" }}
+                        className="hover:opacity-70 transition-opacity p-0.5 shrink-0"
+                        aria-label="Clear search"
                       >
                         <X size={12} />
                       </button>
@@ -157,7 +189,7 @@ export default function Header({ cartCount = 0, onSearchOpen }) {
                 ) : (
                   <button
                     onClick={() => setSearchOpen(true)}
-                    className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold transition-all hover:opacity-80"
+                    className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5 active:scale-95"
                     style={{
                       backgroundColor: "var(--th-surface)",
                       color: "var(--th-muted)",
@@ -190,6 +222,16 @@ export default function Header({ cartCount = 0, onSearchOpen }) {
               >
                 <Heart size={19} />
               </Link>
+
+              {/* Theme Customizer (Desktop only) */}
+              <button
+                onClick={onCustomizerOpen}
+                aria-label="Change Theme"
+                className="hidden lg:flex p-1.5 rounded-full hover:opacity-70 transition-opacity"
+                style={{ color: "var(--th-text)" }}
+              >
+                <Palette size={19} />
+              </button>
 
               {/* Account */}
               <Link

@@ -48,6 +48,7 @@ function AppInner() {
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
 
   // Auto-switch theme based on page for the Stitch demo
   // (users can override manually via customizer)
@@ -90,7 +91,12 @@ function AppInner() {
       }}
     >
       <ScrollHandler />
-      <Header cartCount={cartCount} />
+      {!isLoginPage && (
+        <Header
+          cartCount={cartCount}
+          onCustomizerOpen={() => setCustomizerOpen(true)}
+        />
+      )}
 
       <main>
         <Routes>
@@ -117,10 +123,12 @@ function AppInner() {
         </Routes>
       </main>
 
-      <BottomNav
-        cartCount={cartCount}
-        onCustomizerOpen={() => setCustomizerOpen(true)}
-      />
+      {!isLoginPage && (
+        <BottomNav
+          cartCount={cartCount}
+          onCustomizerOpen={() => setCustomizerOpen(true)}
+        />
+      )}
       <ThemeCustomizer
         open={customizerOpen}
         onClose={() => setCustomizerOpen(false)}

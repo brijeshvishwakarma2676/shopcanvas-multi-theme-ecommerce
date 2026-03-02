@@ -121,36 +121,67 @@ export default function ThemeCustomizer({ open, onClose }) {
             borderTop:
               "1px solid color-mix(in srgb, var(--th-primary) 20%, transparent)",
           }}
-          className="flex items-center justify-between pt-4"
+          className="flex items-center justify-between pt-5 mt-2"
         >
           <div className="flex items-center gap-3">
-            {dark ? (
-              <Moon size={18} style={{ color: "var(--th-primary)" }} />
-            ) : (
-              <Sun size={18} style={{ color: "var(--th-primary)" }} />
-            )}
-            <p
-              className="text-sm font-semibold"
-              style={{ fontFamily: "var(--font-display)" }}
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              style={{
+                backgroundColor:
+                  "color-mix(in srgb, var(--th-primary) 10%, transparent)",
+              }}
             >
-              {dark ? "Dark Mode" : "Light Mode"}
-            </p>
+              {dark || theme === "street" ? (
+                <Moon size={16} style={{ color: "var(--th-primary)" }} />
+              ) : (
+                <Sun size={16} style={{ color: "var(--th-primary)" }} />
+              )}
+            </div>
+            <div>
+              <p
+                className="text-sm font-semibold"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {dark || theme === "street" ? "Dark Mode" : "Light Mode"}
+              </p>
+              {theme === "street" && (
+                <p
+                  className="text-[10px] uppercase tracking-wider font-bold opacity-50"
+                  style={{ color: "var(--th-primary)" }}
+                >
+                  Street is dark only
+                </p>
+              )}
+            </div>
           </div>
+
           <button
-            onClick={() => setDark((v) => !v)}
+            onClick={() => theme !== "street" && setDark((v) => !v)}
+            disabled={theme === "street"}
             style={{
-              backgroundColor: dark ? "var(--th-primary)" : "#e5e7eb",
-              transition: "background-color 0.2s ease",
+              backgroundColor:
+                dark || theme === "street"
+                  ? "var(--th-primary)"
+                  : "color-mix(in srgb, var(--th-text) 10%, transparent)",
+              opacity: theme === "street" ? 0.6 : 1,
+              cursor: theme === "street" ? "not-allowed" : "pointer",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
-            className="relative h-7 w-12 rounded-full"
+            className="group relative h-7 w-12 rounded-full ring-2 ring-transparent transition-all hover:ring-primary/20"
           >
             <span
               style={{
-                transform: dark ? "translateX(20px)" : "translateX(2px)",
-                transition: "transform 0.2s ease",
-                backgroundColor: dark ? "#000" : "#fff",
+                left: dark || theme === "street" ? "24px" : "4px",
+                transition: "left 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                backgroundColor:
+                  dark || theme === "street"
+                    ? theme === "street"
+                      ? "#000"
+                      : "#fff"
+                    : "#fff",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
               }}
-              className="absolute top-0.5 h-6 w-6 rounded-full shadow"
+              className="absolute top-1 h-5 w-5 rounded-full shadow-md"
             />
           </button>
         </div>

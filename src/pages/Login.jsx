@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff, X, Home } from "lucide-react";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -65,20 +65,26 @@ export default function Login() {
         className="flex-1 flex items-center justify-center min-h-screen p-6 sm:p-12 lg:p-24"
         style={{ backgroundColor: "var(--th-bg)" }}
       >
-        <div className="w-full max-w-md">
-          {/* Close button (mobile only) */}
-          <div className="flex items-center justify-between mb-8 lg:hidden">
+        <div className="w-full max-w-md relative">
+          {/* Home button (all devices) */}
+          <div className="absolute -top-12 left-0 lg:-top-16">
             <button
-              onClick={() => navigate(-1)}
-              className="flex items-center justify-center size-10 rounded-full transition-colors"
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 px-4 py-2 rounded-full transition-all hover:bg-black/5 dark:hover:bg-white/5 group"
               style={{
                 backgroundColor:
-                  "color-mix(in srgb, var(--th-primary) 12%, var(--th-bg))",
+                  "color-mix(in srgb, var(--th-primary) 8%, transparent)",
+                color: "var(--th-primary)",
               }}
             >
-              <X size={20} style={{ color: "var(--th-text)" }} />
+              <Home
+                size={18}
+                className="group-hover:-translate-x-0.5 transition-transform"
+              />
+              <span className="text-sm font-bold uppercase tracking-wider">
+                Home
+              </span>
             </button>
-            <div className="size-10" />
           </div>
 
           {/* Heading */}
