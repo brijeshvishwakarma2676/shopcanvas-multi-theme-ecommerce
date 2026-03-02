@@ -48,7 +48,7 @@ export default function Catalog({ onAddToCart }) {
           borderColor: "color-mix(in srgb, var(--th-primary) 15%, transparent)",
         }}
       >
-        <div className="max-w-screen-xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <p
             className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] mb-1"
             style={{ color: "var(--th-primary)" }}
@@ -72,9 +72,9 @@ export default function Catalog({ onAddToCart }) {
         </div>
       </div>
 
-      <div className="max-w-screen-xl mx-auto lg:flex lg:gap-8 lg:px-12">
+      <div className="max-w-7xl mx-auto lg:flex lg:gap-8 lg:px-12">
         {/* ── Desktop left sidebar ── */}
-        <aside className="hidden lg:block w-56 flex-shrink-0 pt-8 self-start sticky top-20">
+        <aside className="hidden lg:block w-56 shrink-0 pt-8 self-start sticky top-20">
           {/* Categories */}
           <div className="mb-8">
             <p
@@ -186,7 +186,7 @@ export default function Catalog({ onAddToCart }) {
           >
             <button
               onClick={() => setFiltersOpen(true)}
-              className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold flex-shrink-0 transition-all"
+              className="flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shrink-0 transition-all"
               style={{
                 backgroundColor: "var(--th-surface)",
                 color: "var(--th-text)",
@@ -202,7 +202,7 @@ export default function Catalog({ onAddToCart }) {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className="rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all duration-200"
+                className="rounded-full px-4 py-2 text-xs font-semibold whitespace-nowrap shrink-0 transition-all duration-200"
                 style={{
                   backgroundColor:
                     activeCategory === cat.id
@@ -217,7 +217,7 @@ export default function Catalog({ onAddToCart }) {
               </button>
             ))}
 
-            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+            <div className="ml-auto flex items-center gap-2 shrink-0">
               <div
                 className="flex items-center gap-1 rounded-full px-3 py-2"
                 style={{

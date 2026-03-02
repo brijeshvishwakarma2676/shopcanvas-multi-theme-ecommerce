@@ -91,7 +91,7 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
             : "color-mix(in srgb, var(--th-primary) 15%, transparent)",
         }}
       >
-        <div className="max-w-screen-xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {isStreet ? (
             <div className="flex items-center justify-between">
               <h1
@@ -139,7 +139,7 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
       </div>
 
       {/* ── Desktop 2-col layout ── */}
-      <div className="max-w-screen-xl mx-auto lg:px-12 lg:flex lg:gap-10 lg:items-start lg:pt-10">
+      <div className="max-w-7xl mx-auto lg:px-12 lg:flex lg:gap-10 lg:items-start lg:pt-10">
         {/* ── Cart items column ── */}
         <div className="flex-1 px-5 lg:px-0 pt-6 lg:pt-0">
           <div
@@ -205,18 +205,34 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
                             fontFamily: "var(--font-mono)",
                           }}
                         >
-                          SIZE: M &nbsp;|&nbsp; COLOR: BLACK
+                          {item.size && `SIZE: ${item.size}`}
+                          {item.size && item.material && " ·  "}
+                          {item.material && item.material.split(",")[0]}
                         </p>
                       ) : (
-                        <p
-                          className="text-[10px] font-bold uppercase tracking-wider"
-                          style={{
-                            color: "var(--th-primary)",
-                            fontFamily: "var(--font-mono)",
-                          }}
-                        >
-                          {item.artist}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                          <p
+                            className="text-[10px] font-bold uppercase tracking-wider"
+                            style={{
+                              color: "var(--th-primary)",
+                              fontFamily: "var(--font-mono)",
+                            }}
+                          >
+                            {item.artist}
+                          </p>
+                          {item.size && (
+                            <span
+                              className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                              style={{
+                                color: "var(--th-text)",
+                                backgroundColor:
+                                  "color-mix(in srgb, var(--th-primary) 8%, transparent)",
+                              }}
+                            >
+                              {item.size}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                     <button
@@ -300,7 +316,7 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
         </div>
 
         {/* ── Summary sidebar ── */}
-        <div className="w-full lg:w-80 lg:flex-shrink-0 px-5 lg:px-0 mt-8 lg:mt-0">
+        <div className="w-full lg:w-80 lg:shrink-0 px-5 lg:px-0 mt-8 lg:mt-0">
           {/* Promo code */}
           <div
             className="p-4 rounded mb-4"

@@ -16,7 +16,10 @@ import {
 } from "lucide-react";
 import { PRODUCTS } from "../data/products";
 import ProductCard from "../components/ProductCard";
+import Reviews from "../components/Reviews";
 import { useTheme } from "../context/ThemeContext";
+import ProductSuggestions from "../components/ProductSuggestions";
+import { showToast } from "../components/Toast";
 
 const ACCORDIONS = [
   {
@@ -99,26 +102,27 @@ export default function ProductDetail({ onAddToCart }) {
   const isGourmet = theme === "gourmet";
   const isStreet = theme === "street";
   const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
-  const related = PRODUCTS.filter(
-    (p) => p.id !== product.id && p.category === product.category,
-  ).slice(0, 4);
 
   const [activeImg, setActiveImg] = useState(0);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [wished, setWished] = useState(false);
   const [openAccordion, setOpenAccordion] = useState("description");
+  const [selectedSize, setSelectedSize] = useState(
+    product.sizes && product.sizes.length > 0 ? product.sizes[0] : null,
+  );
 
   const handleAdd = () => {
-    onAddToCart && onAddToCart(product, qty);
+    onAddToCart && onAddToCart({ ...product, size: selectedSize }, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+    showToast({ productName: product.name, size: selectedSize, qty });
   };
 
   return (
     <div className="min-h-screen pt-16 pb-28">
       {/* ── Back nav ── */}
-      <div className="px-5 lg:px-12 py-4 max-w-screen-xl mx-auto">
+      <div className="px-5 lg:px-12 py-4 max-w-7xl mx-auto">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
@@ -130,13 +134,16 @@ export default function ProductDetail({ onAddToCart }) {
       </div>
 
       {/* ── Desktop split / Mobile single col ── */}
-      <div className="max-w-screen-xl mx-auto lg:px-12 lg:flex lg:gap-12 lg:items-start">
+      <div className="max-w-7xl mx-auto lg:px-12 lg:flex lg:gap-12 lg:items-start">
         {/* ── Image Column ── */}
         <div className="lg:w-[55%] lg:sticky lg:top-20 lg:self-start">
           {/* Main image */}
           <div
-            className="relative w-full aspect-square lg:aspect-[3/4] overflow-hidden"
-            style={{ backgroundColor: "var(--th-surface)" }}
+            className="relative w-full aspect-square lg:aspect-3/4 overflow-hidden"
+            style={{
+              backgroundColor: "var(--th-surface)",
+              borderRadius: isGourmet ? "2.5rem" : isStreet ? "0" : "1.5rem",
+            }}
           >
             <img
               src={product.images ? product.images[activeImg] : product.image}
@@ -215,7 +222,7 @@ export default function ProductDetail({ onAddToCart }) {
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
-                  className="h-20 w-16 overflow-hidden flex-shrink-0 transition-all"
+                  className="h-20 w-16 overflow-hidden shrink-0 transition-all"
                   style={{
                     outline:
                       i === activeImg
@@ -311,25 +318,36 @@ export default function ProductDetail({ onAddToCart }) {
             {product.name}
           </h1>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2 mb-5">
+          {/* Rating Summary */}
+          <div className="flex items-center gap-3 mb-5">
             <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
+              {[1, 2, 3, 4, 5].map((s) => (
                 <Star
-                  key={i}
-                  size={12}
+                  key={s}
+                  size={14}
                   fill={
-                    i < Math.floor(product.rating) ? "currentColor" : "none"
+                    s <= Math.round(product.rating)
+                      ? "var(--th-primary)"
+                      : "none"
                   }
-                  style={{ color: "var(--th-primary)" }}
+                  style={{
+                    color:
+                      s <= Math.round(product.rating)
+                        ? "var(--th-primary)"
+                        : "var(--th-muted)",
+                  }}
                 />
               ))}
             </div>
             <span
-              className="text-xs font-mono"
-              style={{ color: "var(--th-muted)" }}
+              className="text-xs font-bold uppercase tracking-widest"
+              style={{
+                color: "var(--th-muted)",
+                fontFamily: "var(--font-mono)",
+              }}
             >
-              {product.rating} ({product.reviews} reviews)
+              {product.rating} ({product.reviews}{" "}
+              {isStreet ? "DRIPS" : "reviews"})
             </span>
           </div>
 
@@ -371,6 +389,70 @@ export default function ProductDetail({ onAddToCart }) {
                 "color-mix(in srgb, var(--th-primary) 15%, transparent)",
             }}
           />
+
+          {/* Size Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <p
+                  className="text-xs font-bold uppercase tracking-widest"
+                  style={{
+                    color: "var(--th-text)",
+                    fontFamily: "var(--font-mono)",
+                  }}
+                >
+                  {isStreet ? "SIZE" : "Select Size"}
+                </p>
+                {selectedSize && (
+                  <span
+                    className="text-xs font-bold px-2 py-0.5"
+                    style={{
+                      color: "var(--th-primary)",
+                      backgroundColor:
+                        "color-mix(in srgb, var(--th-primary) 10%, transparent)",
+                      borderRadius: isStreet ? "0" : "9999px",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {selectedSize}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className="px-4 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-200"
+                    style={{
+                      borderRadius: isStreet
+                        ? "0"
+                        : isGourmet
+                          ? "9999px"
+                          : "0.5rem",
+                      border:
+                        selectedSize === size
+                          ? "2px solid var(--th-primary)"
+                          : "2px solid color-mix(in srgb, var(--th-primary) 20%, transparent)",
+                      backgroundColor:
+                        selectedSize === size
+                          ? "color-mix(in srgb, var(--th-primary) 10%, transparent)"
+                          : "var(--th-surface)",
+                      color:
+                        selectedSize === size
+                          ? "var(--th-primary)"
+                          : "var(--th-text)",
+                      fontFamily: isStreet ? "var(--font-mono)" : "inherit",
+                      transform:
+                        selectedSize === size ? "scale(1.06)" : "scale(1)",
+                    }}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quantity + Add to Cart */}
           <div className="flex gap-3 mb-8">
@@ -503,34 +585,18 @@ export default function ProductDetail({ onAddToCart }) {
         </div>
       </div>
 
-      {/* ── You May Also Like ── */}
-      {related.length > 0 && (
-        <section className="mt-16 px-5 lg:px-12 max-w-screen-xl mx-auto">
-          <div className="mb-8 flex items-center justify-between">
-            <h2
-              className="text-xl font-bold"
-              style={{
-                fontFamily: "var(--font-serif)",
-                color: "var(--th-text)",
-              }}
-            >
-              You May Also Like
-            </h2>
-            <Link
-              to="/catalog"
-              className="text-xs font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
-              style={{ color: "var(--th-primary)" }}
-            >
-              View All
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} onAddToCart={onAddToCart} />
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ── Reviews Section ── */}
+      <Reviews
+        reviews={product.mockReviews}
+        onRate={(data) => console.log("New rating submitted:", data)}
+      />
+
+      {/* ── Product Suggestions ── */}
+      <ProductSuggestions
+        currentProductId={product.id}
+        category={product.category}
+        theme={product.theme}
+      />
     </div>
   );
 }

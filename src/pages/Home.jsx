@@ -167,7 +167,21 @@ export default function Home({ onAddToCart }) {
   const isStreet = theme === "street";
   const isGourmet = theme === "gourmet";
 
-  const products = PRODUCTS.slice(0, 4);
+  // Theme-specific product filters
+  const themeMap = {
+    gallery: "gallery",
+    luxury: "luxury",
+    gourmet: "gourmet",
+    street: "street",
+  };
+  const currentTheme = themeMap[theme] || "gallery";
+  const featuredProducts = PRODUCTS.filter(
+    (p) => p.theme === currentTheme,
+  ).slice(0, 4);
+  const newArrivals = PRODUCTS.filter((p) => p.tag === "New").slice(0, 6);
+  const bestsellers = PRODUCTS.filter(
+    (p) => p.tag === "Bestseller" || p.reviews > 60,
+  ).slice(0, 5);
 
   const tickerItems = [
     ...cfg.tickerItems,
@@ -295,7 +309,7 @@ export default function Home({ onAddToCart }) {
             />
           </div>
 
-          <div className="relative z-10 pb-16 px-6 max-w-screen-xl mx-auto w-full">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-5 max-w-7xl mx-auto w-full">
             <div className="max-w-sm lg:max-w-xl">
               <p
                 className="mb-4 text-xs font-bold uppercase tracking-[0.25em]"
@@ -369,8 +383,8 @@ export default function Home({ onAddToCart }) {
       )}
 
       {/* ── Categories ── */}
-      <section className="py-10 px-4 lg:px-12">
-        <div className="max-w-screen-xl mx-auto">
+      <section className="py-20 px-5 lg:px-12 max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           {/* Heading */}
           <div className="mb-5 flex items-center justify-between">
             <div>
@@ -505,7 +519,7 @@ export default function Home({ onAddToCart }) {
           borderRadius: isStreet ? "0" : "1.5rem 1.5rem 0 0",
         }}
       >
-        <div className="max-w-screen-xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="mb-8 flex items-center justify-between">
             <div>
               <span
@@ -541,7 +555,7 @@ export default function Home({ onAddToCart }) {
 
           {/* Product grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
-            {products.map((product) => (
+            {featuredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -566,6 +580,280 @@ export default function Home({ onAddToCart }) {
           </div>
         </div>
       </section>
+
+      {/* ── New Arrivals – Horizontal Scroll Strip ── */}
+      {newArrivals.length > 0 && (
+        <section
+          className="py-16 px-4 lg:px-12"
+          style={{ backgroundColor: "var(--th-bg)" }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p
+                  className="text-[11px] font-mono font-bold uppercase tracking-widest mb-1"
+                  style={{ color: "var(--th-primary)" }}
+                >
+                  Just Landed
+                </p>
+                <h2
+                  className="text-2xl font-bold"
+                  style={{
+                    fontFamily: isStreet
+                      ? "var(--font-mono)"
+                      : "var(--font-serif)",
+                    color: "var(--th-text)",
+                    textTransform: isStreet ? "uppercase" : undefined,
+                  }}
+                >
+                  {isStreet
+                    ? "NEW DROPS"
+                    : isGourmet
+                      ? "Fresh Arrivals"
+                      : "New Arrivals"}
+                </h2>
+              </div>
+              <Link
+                to="/catalog"
+                className="text-xs font-bold uppercase tracking-widest hover:opacity-60 transition-opacity flex items-center gap-1"
+                style={{ color: "var(--th-primary)" }}
+              >
+                See All <ArrowRight size={12} />
+              </Link>
+            </div>
+
+            <div
+              className="flex gap-5 overflow-x-auto pb-4 lg:grid lg:grid-cols-6 lg:overflow-x-visible"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {newArrivals.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.id}`}
+                  className="group flex-none w-[160px] lg:w-auto"
+                >
+                  <div
+                    className="relative aspect-3/4 overflow-hidden mb-3"
+                    style={{
+                      backgroundColor: "var(--th-surface)",
+                      borderRadius: isStreet
+                        ? "0"
+                        : isGourmet
+                          ? "1.5rem"
+                          : "0.75rem",
+                    }}
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    {product.tag && (
+                      <span
+                        className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5"
+                        style={{
+                          backgroundColor: "var(--th-primary)",
+                          color: isStreet ? "#000" : "#fff",
+                          borderRadius: isStreet ? "0" : "9999px",
+                        }}
+                      >
+                        {product.tag}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-widest mb-0.5 truncate"
+                    style={{
+                      color: "var(--th-primary)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {product.artist}
+                  </p>
+                  <p
+                    className="text-sm font-semibold leading-tight mb-1 truncate"
+                    style={{
+                      color: "var(--th-text)",
+                      fontFamily: isStreet
+                        ? "var(--font-mono)"
+                        : "var(--font-serif)",
+                    }}
+                  >
+                    {product.name}
+                  </p>
+                  <p
+                    className="text-sm font-bold"
+                    style={{ color: "var(--th-text)" }}
+                  >
+                    ${product.price.toLocaleString()}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Bestsellers – Editorial Grid ── */}
+      {bestsellers.length >= 3 && (
+        <section
+          className="py-16 px-4 lg:px-12"
+          style={{
+            backgroundColor: isStreet ? "#0f0f0f" : "var(--th-surface)",
+          }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p
+                  className="text-[11px] font-mono font-bold uppercase tracking-widest mb-1"
+                  style={{ color: "var(--th-primary)" }}
+                >
+                  Customer Favourites
+                </p>
+                <h2
+                  className="text-2xl font-bold"
+                  style={{
+                    fontFamily: isStreet
+                      ? "var(--font-mono)"
+                      : "var(--font-serif)",
+                    color: isStreet ? "#fff" : "var(--th-text)",
+                    textTransform: isStreet ? "uppercase" : undefined,
+                  }}
+                >
+                  {isStreet
+                    ? "TOP SELLERS"
+                    : isGourmet
+                      ? "Most Loved"
+                      : "Bestsellers"}
+                </h2>
+              </div>
+              <Link
+                to="/catalog"
+                className="text-xs font-bold uppercase tracking-widest hover:opacity-60 transition-opacity hidden sm:flex items-center gap-1"
+                style={{ color: "var(--th-muted)" }}
+              >
+                Browse All <ArrowRight size={12} />
+              </Link>
+            </div>
+
+            {/* Editorial: 1 large hero + 4 smaller cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Hero bestseller */}
+              <Link
+                to={`/product/${bestsellers[0].id}`}
+                className="group col-span-2 lg:col-span-1 lg:row-span-2"
+              >
+                <div
+                  className="relative w-full overflow-hidden"
+                  style={{
+                    aspectRatio: "3/4",
+                    backgroundColor: "var(--th-bg)",
+                    borderRadius: isStreet ? "0" : isGourmet ? "2rem" : "1rem",
+                  }}
+                >
+                  <img
+                    src={bestsellers[0].image}
+                    alt={bestsellers[0].name}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/65 to-transparent" />
+                  <div className="absolute bottom-0 p-5">
+                    <p className="text-[10px] text-white/70 font-mono uppercase tracking-widest mb-1">
+                      {bestsellers[0].artist}
+                    </p>
+                    <h3
+                      className="text-white font-bold text-lg leading-tight mb-2"
+                      style={{
+                        fontFamily: isStreet
+                          ? "var(--font-mono)"
+                          : "var(--font-serif)",
+                      }}
+                    >
+                      {bestsellers[0].name}
+                    </h3>
+                    <span
+                      className="inline-block text-xs font-bold px-3 py-1"
+                      style={{
+                        backgroundColor: "var(--th-primary)",
+                        color: isStreet ? "#000" : "#fff",
+                        borderRadius: isStreet ? "0" : "9999px",
+                      }}
+                    >
+                      ${bestsellers[0].price.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+
+              {/* Secondary cards */}
+              {bestsellers.slice(1, 5).map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/product/${product.id}`}
+                  className="group"
+                >
+                  <div
+                    className="relative aspect-square overflow-hidden mb-3"
+                    style={{
+                      backgroundColor: "var(--th-bg)",
+                      borderRadius: isStreet
+                        ? "0"
+                        : isGourmet
+                          ? "1.5rem"
+                          : "0.75rem",
+                    }}
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    {product.tag && (
+                      <span
+                        className="absolute top-2 left-2 text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider"
+                        style={{
+                          backgroundColor: "var(--th-primary)",
+                          color: isStreet ? "#000" : "#fff",
+                          borderRadius: isStreet ? "0" : "9999px",
+                        }}
+                      >
+                        {product.tag}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className="text-[10px] font-bold uppercase tracking-widest mb-0.5"
+                    style={{
+                      color: "var(--th-primary)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {product.artist}
+                  </p>
+                  <p
+                    className="text-sm font-semibold leading-tight truncate"
+                    style={{
+                      color: isStreet ? "#fff" : "var(--th-text)",
+                      fontFamily: isStreet
+                        ? "var(--font-mono)"
+                        : "var(--font-serif)",
+                    }}
+                  >
+                    {product.name}
+                  </p>
+                  <p
+                    className="text-sm font-bold mt-0.5"
+                    style={{ color: "var(--th-primary)" }}
+                  >
+                    ${product.price.toLocaleString()}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Brand Statement (gallery / luxury only) ── */}
       {!isStreet && !isGourmet && (

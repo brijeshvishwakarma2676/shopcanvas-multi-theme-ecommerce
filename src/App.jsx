@@ -10,6 +10,7 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import ThemeCustomizer from "./components/ThemeCustomizer";
+import Toast from "./components/Toast";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import ProductDetail from "./pages/ProductDetail";
@@ -133,6 +134,7 @@ function AppInner() {
         open={customizerOpen}
         onClose={() => setCustomizerOpen(false)}
       />
+      <Toast />
     </div>
   );
 }

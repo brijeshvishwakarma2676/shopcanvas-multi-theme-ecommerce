@@ -24,7 +24,7 @@ export default function ProductCard({ product, onAddToCart }) {
     <Link to={`/product/${product.id}`} className="group flex flex-col gap-3">
       {/* Image container */}
       <div
-        className="relative w-full aspect-[3/4] overflow-hidden"
+        className="relative w-full aspect-3/4 overflow-hidden"
         style={{ backgroundColor: "var(--th-surface)" }}
       >
         <img
