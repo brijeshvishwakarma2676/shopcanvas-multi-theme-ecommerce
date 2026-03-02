@@ -24,20 +24,56 @@ export default function Header({
 }) {
   const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef(null);
   const searchContainerRef = useRef(null);
+  const lastScrollY = useRef(0);
   const location = useLocation();
 
   const isStreet = theme === "street";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    let scrollTimeout;
+
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 20);
+
+      // Hide on scroll down, show on scroll up
+      if (
+        currentScrollY > lastScrollY.current &&
+        currentScrollY > 80 &&
+        !menuOpen
+      ) {
+        setIsHidden(true);
+      } else {
+        setIsHidden(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+
+      // Clear previous timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // Show navbar again when scrolling stops
+      scrollTimeout = setTimeout(() => {
+        setIsHidden(false);
+      }, 400); // 400ms after scroll stops
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [menuOpen]);
 
   // Close menu on navigation
   useEffect(() => {
@@ -85,9 +121,11 @@ export default function Header({
           WebkitBackdropFilter: "blur(20px)",
           borderBottom:
             "1px solid color-mix(in srgb, var(--th-primary) 20%, transparent)",
-          transition: "background-color 0.3s ease",
+          transition: "background-color 0.3s ease, transform 0.3s ease-in-out",
         }}
-        className="fixed top-0 left-0 right-0 z-50"
+        className={`fixed top-0 left-0 right-0 z-50 ${
+          isHidden ? "-translate-y-full" : "translate-y-0"
+        }`}
       >
         <div className="mx-auto max-w-7xl px-5 lg:px-10">
           <div className="flex h-16 items-center justify-between gap-6">
