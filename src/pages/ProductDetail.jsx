@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { PRODUCTS } from "../data/products";
 import ProductCard from "../components/ProductCard";
+import { useTheme } from "../context/ThemeContext";
 
 const ACCORDIONS = [
   {
@@ -94,6 +95,9 @@ const ACCORDIONS = [
 export default function ProductDetail({ onAddToCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isGourmet = theme === "gourmet";
+  const isStreet = theme === "street";
   const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
   const related = PRODUCTS.filter(
     (p) => p.id !== product.id && p.category === product.category,
@@ -234,30 +238,70 @@ export default function ProductDetail({ onAddToCart }) {
 
         {/* ── Info Column ── */}
         <div className="lg:w-[45%] px-5 lg:px-0 pt-6 lg:pt-0">
-          {/* Artist + badge row */}
-          <div className="flex items-center justify-between mb-2">
-            <p
-              className="text-[11px] font-bold uppercase tracking-[0.2em]"
-              style={{
-                color: "var(--th-primary)",
-                fontFamily: "var(--font-mono)",
-              }}
-            >
-              {product.artist}
-            </p>
-            {product.tag && (
+          {/* Gourmet: Organic badge pills + rating */}
+          {isGourmet ? (
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
               <span
-                className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded"
+                className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
                 style={{
-                  backgroundColor:
-                    "color-mix(in srgb, var(--th-primary) 15%, transparent)",
                   color: "var(--th-primary)",
+                  backgroundColor:
+                    "color-mix(in srgb, var(--th-primary) 12%, transparent)",
+                  borderRadius: "0.25rem",
                 }}
               >
-                {product.tag}
+                Organic
               </span>
-            )}
-          </div>
+              <span
+                className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider"
+                style={{
+                  color: "var(--th-primary)",
+                  backgroundColor:
+                    "color-mix(in srgb, var(--th-primary) 12%, transparent)",
+                  borderRadius: "0.25rem",
+                }}
+              >
+                Cold Pressed
+              </span>
+              <div className="flex items-center gap-1 ml-auto">
+                <Star size={14} fill="#fbbf24" className="text-yellow-400" />
+                <span
+                  className="text-sm font-bold"
+                  style={{ color: "var(--th-text)" }}
+                >
+                  4.9
+                </span>
+                <span className="text-xs" style={{ color: "var(--th-muted)" }}>
+                  (128 reviews)
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* All other themes: artist + badge row */
+            <div className="flex items-center justify-between mb-2">
+              <p
+                className="text-[11px] font-bold uppercase tracking-[0.2em]"
+                style={{
+                  color: "var(--th-primary)",
+                  fontFamily: "var(--font-mono)",
+                }}
+              >
+                {product.artist}
+              </p>
+              {product.tag && (
+                <span
+                  className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded"
+                  style={{
+                    backgroundColor:
+                      "color-mix(in srgb, var(--th-primary) 15%, transparent)",
+                    color: "var(--th-primary)",
+                  }}
+                >
+                  {product.tag}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Title */}
           <h1

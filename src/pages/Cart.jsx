@@ -8,11 +8,14 @@ import {
   Tag,
   ShoppingBag,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 const EMPTY_IMG =
   "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=60";
 
 export default function Cart({ cart, onUpdateQty, onRemove }) {
+  const { theme } = useTheme();
+  const isStreet = theme === "street";
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState(false);
@@ -34,27 +37,40 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
   /* ── Empty cart ── */
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen pt-16 pb-28 flex flex-col items-center justify-center px-6 text-center">
+      <div
+        className="min-h-screen pt-16 pb-28 flex flex-col items-center justify-center px-6 text-center"
+        style={{ backgroundColor: isStreet ? "var(--th-bg)" : undefined }}
+      >
         <div
-          className="mb-6 h-28 w-28 flex items-center justify-center rounded-full text-5xl"
-          style={{ backgroundColor: "var(--th-surface)" }}
+          className="mb-6 h-28 w-28 flex items-center justify-center text-5xl"
+          style={{
+            backgroundColor: "var(--th-surface)",
+            borderRadius: isStreet ? "0" : "9999px",
+          }}
         >
           🛒
         </div>
         <h2
           className="mb-2 text-2xl font-bold"
-          style={{ fontFamily: "var(--font-serif)", color: "var(--th-text)" }}
+          style={{
+            fontFamily: isStreet ? "var(--font-mono)" : "var(--font-serif)",
+            color: "var(--th-text)",
+            textTransform: isStreet ? "uppercase" : undefined,
+            letterSpacing: isStreet ? "-0.02em" : undefined,
+          }}
         >
-          Your cart is empty
+          {isStreet ? "CART IS EMPTY" : "Your cart is empty"}
         </h2>
         <p
           className="mb-8 text-sm max-w-xs"
           style={{ color: "var(--th-muted)" }}
         >
-          Add something beautiful to get started.
+          {isStreet
+            ? "ADD SOME DRIP TO GET STARTED."
+            : "Add something beautiful to get started."}
         </p>
         <Link to="/catalog" className="btn-primary inline-flex">
-          Explore the Collection
+          {isStreet ? "SHOP NOW " : "Explore the Collection "}
           <ArrowRight size={14} />
         </Link>
       </div>
@@ -62,35 +78,63 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
   }
 
   return (
-    <div className="min-h-screen pt-16 pb-28">
+    <div
+      className="min-h-screen pt-16 pb-28"
+      style={{ backgroundColor: isStreet ? "var(--th-bg)" : undefined }}
+    >
       {/* ── Page Header ── */}
       <div
-        className="px-5 lg:px-12 py-10 border-b"
+        className="px-5 lg:px-12 py-8 lg:py-10 border-b"
         style={{
-          borderColor: "color-mix(in srgb, var(--th-primary) 15%, transparent)",
+          borderColor: isStreet
+            ? "rgba(255,255,255,0.08)"
+            : "color-mix(in srgb, var(--th-primary) 15%, transparent)",
         }}
       >
         <div className="max-w-screen-xl mx-auto">
-          <p
-            className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] mb-1"
-            style={{ color: "var(--th-primary)" }}
-          >
-            Your Selection
-          </p>
-          <div className="flex items-end justify-between">
-            <h1
-              className="text-3xl lg:text-4xl font-bold"
-              style={{
-                fontFamily: "var(--font-serif)",
-                color: "var(--th-text)",
-              }}
-            >
-              Shopping Cart
-            </h1>
-            <p className="text-xs" style={{ color: "var(--th-muted)" }}>
-              {cart.length} item{cart.length !== 1 ? "s" : ""}
-            </p>
-          </div>
+          {isStreet ? (
+            <div className="flex items-center justify-between">
+              <h1
+                className="text-2xl font-extrabold tracking-tight"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  color: "var(--th-text)",
+                }}
+              >
+                YOUR CART ({cart.reduce((s, i) => s + i.qty, 0)})
+              </h1>
+              <button
+                onClick={() => cart.forEach((item) => onRemove(item.id))}
+                className="text-xs font-bold uppercase tracking-widest hover:opacity-60 transition-opacity"
+                style={{ color: "var(--th-muted)" }}
+              >
+                CLEAR
+              </button>
+            </div>
+          ) : (
+            <>
+              <p
+                className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] mb-1"
+                style={{ color: "var(--th-primary)" }}
+              >
+                Your Selection
+              </p>
+              <div className="flex items-end justify-between">
+                <h1
+                  className="text-3xl lg:text-4xl font-bold"
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    color: "var(--th-text)",
+                  }}
+                >
+                  Shopping Cart
+                </h1>
+                <p className="text-xs" style={{ color: "var(--th-muted)" }}>
+                  {cart.length} item{cart.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -98,58 +142,117 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
       <div className="max-w-screen-xl mx-auto lg:px-12 lg:flex lg:gap-10 lg:items-start lg:pt-10">
         {/* ── Cart items column ── */}
         <div className="flex-1 px-5 lg:px-0 pt-6 lg:pt-0">
-          <div className="flex flex-col gap-4">
+          <div
+            className="flex flex-col"
+            style={{ gap: isStreet ? "0" : "1rem" }}
+          >
             {cart.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 p-4 rounded"
-                style={{ backgroundColor: "var(--th-surface)" }}
+                className="flex gap-4 p-4"
+                style={{
+                  backgroundColor: isStreet
+                    ? "var(--th-surface)"
+                    : "var(--th-surface)",
+                  borderBottom: isStreet
+                    ? "1px solid rgba(255,255,255,0.06)"
+                    : undefined,
+                  borderRadius: isStreet ? "0" : undefined,
+                }}
               >
                 {/* Image */}
-                <Link to={`/product/${item.id}`} className="flex-shrink-0">
+                <Link to={`/product/${item.id}`} className="shrink-0">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="h-28 w-22 rounded object-cover"
-                    style={{ width: "88px" }}
+                    className="h-24 object-cover"
+                    style={{
+                      width: "80px",
+                      borderRadius: isStreet ? "0" : "0.25rem",
+                    }}
                   />
                 </Link>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
-                  <div>
-                    <p
-                      className="text-[10px] font-bold uppercase tracking-wider mb-0.5 truncate"
-                      style={{
-                        color: "var(--th-primary)",
-                        fontFamily: "var(--font-mono)",
-                      }}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <Link to={`/product/${item.id}`}>
+                        <h3
+                          className="text-sm font-bold leading-tight mb-1 hover:opacity-70 transition-opacity truncate"
+                          style={{
+                            fontFamily: isStreet
+                              ? "var(--font-mono)"
+                              : "var(--font-serif)",
+                            color: "var(--th-text)",
+                            textTransform: isStreet ? "uppercase" : undefined,
+                            letterSpacing: isStreet ? "-0.01em" : undefined,
+                          }}
+                        >
+                          {isStreet
+                            ? item.name
+                                .toUpperCase()
+                                .replace(/ /g, " // ")
+                                .slice(0, item.name.toUpperCase().length)
+                            : item.name}
+                        </h3>
+                      </Link>
+                      {isStreet ? (
+                        <p
+                          className="text-[10px] uppercase tracking-wider"
+                          style={{
+                            color: "var(--th-muted)",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
+                          SIZE: M &nbsp;|&nbsp; COLOR: BLACK
+                        </p>
+                      ) : (
+                        <p
+                          className="text-[10px] font-bold uppercase tracking-wider"
+                          style={{
+                            color: "var(--th-primary)",
+                            fontFamily: "var(--font-mono)",
+                          }}
+                        >
+                          {item.artist}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => onRemove(item.id)}
+                      className="shrink-0 hover:opacity-60 transition-opacity"
+                      style={{ color: "var(--th-muted)" }}
                     >
-                      {item.artist}
-                    </p>
-                    <Link to={`/product/${item.id}`}>
-                      <h3
-                        className="text-sm font-semibold leading-tight mb-1 hover:opacity-70 transition-opacity"
-                        style={{
-                          fontFamily: "var(--font-serif)",
-                          color: "var(--th-text)",
-                        }}
-                      >
-                        {item.name}
-                      </h3>
-                    </Link>
-                    <p className="text-xs" style={{ color: "var(--th-muted)" }}>
-                      ${item.price.toLocaleString()} each
-                    </p>
+                      <Trash2 size={14} />
+                    </button>
                   </div>
 
                   <div className="flex items-center justify-between mt-3">
+                    {/* Price */}
+                    <span
+                      className="font-bold"
+                      style={{
+                        color: isStreet
+                          ? "var(--th-primary)"
+                          : "var(--th-text)",
+                        fontFamily: isStreet ? "var(--font-mono)" : undefined,
+                        fontSize: isStreet ? "1.05rem" : "0.875rem",
+                      }}
+                    >
+                      {isStreet
+                        ? `$${item.price.toFixed(2)}`
+                        : `$${(item.price * item.qty).toLocaleString()}`}
+                    </span>
+
                     {/* Quantity stepper */}
                     <div
-                      className="flex items-center rounded"
+                      className="flex items-center"
                       style={{
-                        border:
-                          "1px solid color-mix(in srgb, var(--th-primary) 30%, transparent)",
+                        border: isStreet
+                          ? "1px solid rgba(255,255,255,0.15)"
+                          : "1px solid color-mix(in srgb, var(--th-primary) 30%, transparent)",
+                        borderRadius: isStreet ? "0" : "0.25rem",
                       }}
                     >
                       <button
@@ -157,9 +260,9 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
                           onUpdateQty(item.id, Math.max(1, item.qty - 1))
                         }
                         style={{ color: "var(--th-text)" }}
-                        className="flex h-7 w-7 items-center justify-center hover:opacity-60"
+                        className="flex h-8 w-8 items-center justify-center hover:opacity-60"
                       >
-                        <Minus size={11} />
+                        <Minus size={12} />
                       </button>
                       <span
                         className="w-8 text-center text-xs font-bold"
@@ -173,25 +276,9 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
                       <button
                         onClick={() => onUpdateQty(item.id, item.qty + 1)}
                         style={{ color: "var(--th-text)" }}
-                        className="flex h-7 w-7 items-center justify-center hover:opacity-60"
+                        className="flex h-8 w-8 items-center justify-center hover:opacity-60"
                       >
-                        <Plus size={11} />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: "var(--th-text)" }}
-                      >
-                        ${(item.price * item.qty).toLocaleString()}
-                      </span>
-                      <button
-                        onClick={() => onRemove(item.id)}
-                        className="hover:opacity-60 transition-opacity p-1 rounded hover:bg-red-500/10"
-                        style={{ color: "var(--th-muted)" }}
-                      >
-                        <Trash2 size={14} />
+                        <Plus size={12} />
                       </button>
                     </div>
                   </div>
@@ -295,38 +382,71 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
 
           {/* Order summary */}
           <div
-            className="p-5 rounded mb-4"
-            style={{ backgroundColor: "var(--th-surface)" }}
+            className="p-5 mb-4"
+            style={{
+              backgroundColor: "var(--th-surface)",
+              borderRadius: isStreet ? "0" : "0.25rem",
+            }}
           >
             <h3
               className="mb-4 text-sm font-bold uppercase tracking-widest"
-              style={{ color: "var(--th-text)" }}
+              style={{
+                color: "var(--th-text)",
+                fontFamily: isStreet ? "var(--font-mono)" : undefined,
+                letterSpacing: isStreet ? "0.12em" : undefined,
+              }}
             >
-              Order Summary
+              {isStreet ? "ORDER SUMMARY" : "Order Summary"}
             </h3>
 
             {[
-              { label: "Subtotal", value: `$${subtotal.toLocaleString()}` },
               {
-                label: "Shipping",
+                label: isStreet ? "Subtotal" : "Subtotal",
+                value: `$${subtotal.toLocaleString()}`,
+              },
+              {
+                label: isStreet ? "Shipping" : "Shipping",
                 value: shipping === 0 ? "Free ✓" : `$${shipping}`,
               },
               ...(discount > 0
-                ? [{ label: "Promo (CANVAS10)", value: `-$${discount}` }]
+                ? [
+                    {
+                      label: isStreet ? "Promo" : "Promo (CANVAS10)",
+                      value: `-$${discount}`,
+                    },
+                  ]
                 : []),
             ].map((row) => (
-              <div key={row.label} className="flex justify-between mb-3">
-                <span className="text-xs" style={{ color: "var(--th-muted)" }}>
+              <div
+                key={row.label}
+                className="flex justify-between mb-3"
+                style={{
+                  paddingBottom: isStreet ? "0.75rem" : undefined,
+                  borderBottom: isStreet
+                    ? "1px solid rgba(255,255,255,0.06)"
+                    : undefined,
+                }}
+              >
+                <span
+                  className="text-xs"
+                  style={{
+                    color: "var(--th-muted)",
+                    fontFamily: isStreet ? "var(--font-mono)" : undefined,
+                    textTransform: isStreet ? "uppercase" : undefined,
+                    letterSpacing: isStreet ? "0.08em" : undefined,
+                  }}
+                >
                   {row.label}
                 </span>
                 <span
                   className="text-xs font-semibold"
                   style={{
-                    color: row.label.startsWith("Promo")
+                    color: row.label.toLowerCase().includes("promo")
                       ? "var(--th-primary)"
-                      : row.label === "Shipping" && shipping === 0
+                      : row.label.toLowerCase() === "shipping" && shipping === 0
                         ? "var(--th-primary)"
                         : "var(--th-text)",
+                    fontFamily: isStreet ? "var(--font-mono)" : undefined,
                   }}
                 >
                   {row.value}
@@ -337,21 +457,32 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
             <div
               className="flex justify-between pt-4 mt-1"
               style={{
-                borderTop:
-                  "1px solid color-mix(in srgb, var(--th-primary) 20%, transparent)",
+                borderTop: isStreet
+                  ? "2px solid rgba(255,255,255,0.12)"
+                  : "1px solid color-mix(in srgb, var(--th-primary) 20%, transparent)",
               }}
             >
               <span
-                className="text-sm font-bold"
-                style={{ color: "var(--th-text)" }}
+                className="font-bold"
+                style={{
+                  color: "var(--th-text)",
+                  fontSize: isStreet ? "0.9rem" : "0.875rem",
+                  fontFamily: isStreet ? "var(--font-mono)" : undefined,
+                  textTransform: isStreet ? "uppercase" : undefined,
+                  letterSpacing: isStreet ? "0.1em" : undefined,
+                }}
               >
-                Total
+                TOTAL
               </span>
               <span
-                className="text-lg font-bold"
-                style={{ color: "var(--th-primary)" }}
+                className="font-bold"
+                style={{
+                  color: "var(--th-primary)",
+                  fontSize: isStreet ? "1.35rem" : "1.125rem",
+                  fontFamily: isStreet ? "var(--font-mono)" : undefined,
+                }}
               >
-                ${total.toLocaleString()}
+                ${total.toFixed(2)}
               </span>
             </div>
 
@@ -390,16 +521,20 @@ export default function Cart({ cart, onUpdateQty, onRemove }) {
 
           {/* CTA */}
           <button
-            className="w-full flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-[0.12em] py-4 rounded transition-all duration-200"
+            className="w-full flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-[0.12em] py-4 transition-all duration-200"
             style={{
               backgroundColor: "var(--th-primary)",
-              color: "#fff",
-              boxShadow:
-                "0 4px 20px color-mix(in srgb, var(--th-primary) 35%, transparent)",
+              color: isStreet ? "#000" : "#fff",
+              borderRadius: isStreet ? "0" : "0.25rem",
+              fontFamily: isStreet ? "var(--font-mono)" : undefined,
+              letterSpacing: isStreet ? "0.15em" : "0.12em",
+              boxShadow: isStreet
+                ? "none"
+                : "0 4px 20px color-mix(in srgb, var(--th-primary) 35%, transparent)",
             }}
           >
-            <ShoppingBag size={16} />
-            Proceed to Checkout
+            {!isStreet && <ShoppingBag size={16} />}
+            {isStreet ? "CHECKOUT →" : "Proceed to Checkout"}
           </button>
 
           <Link
